@@ -8,9 +8,11 @@ import (
 
 func checkWebsite(website string) error {
 
-	tz, _ := time.LoadLocation("Europe/Paris")
+	parisTz, _ := time.LoadLocation("Europe/Paris")
+	pacificTz, _ := time.LoadLocation("America/Los_Angeles")
 	now := time.Now()
-	parisTime := now.In(tz)
+	parisTime := now.In(parisTz)
+	pacificTime := now.In(pacificTz)
 
 	resp, err := http.Get(website)
 	if err != nil {
@@ -23,10 +25,11 @@ func checkWebsite(website string) error {
 		fmt.Println("Website :", website, " Broken", "HTTP Response Status:", resp.StatusCode, http.StatusText(resp.StatusCode))
 	}
 	fmt.Println("Paris is magic : what time is it in Paris ?", parisTime)
+	fmt.Println("West coast is best coast : what time is it in LA ?", pacificTime)
 
 	return err
 }
 
 func main() {
-	checkWebsite("https://chemidy.cloud")
+	checkWebsite("https://google.com")
 }

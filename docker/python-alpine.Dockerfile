@@ -23,15 +23,10 @@ RUN adduser \
     --uid "${UID}" \
     "${USER}"
 WORKDIR $GOPATH/src/mypackage/myapp/
-
-# use modules
-COPY go.mod .
-
-ENV GO111MODULE=on
-RUN go mod download
-RUN go mod verify
-
 COPY . .
+
+# Fetch dependencies.
+RUN go get -d -v
 
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
@@ -41,8 +36,9 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
 ############################
 # STEP 2 build a small image
 ############################
-FROM scratch
+FROM python:3.9-alpine
 
+RUN pip install --no-cache-dir aws-lambda-powertools pydantic
 # Import from builder.
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
